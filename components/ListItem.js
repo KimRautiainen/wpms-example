@@ -1,19 +1,19 @@
 import { FlatList, Image, Text, TouchableOpacity } from "react-native";
 import PropTypes from 'prop-types';
 
-const ListItem = (props) => {
+const ListItem = ({singleMedia}) => { 
     return (
         <TouchableOpacity
             onPress={() => {
-                console.log('touched!', props.singleMedia.title);
+                console.log('touched!', singleMedia.title);
             }}
         >
             <Image
                 style={{ width: 100, height: 100 }}
-                source={{ uri: props.singleMedia.thumbnails.w160 }}
+                source={{ uri: singleMedia.thumbnails.w160 }}
             />
-            <Text>{props.singleMedia.title}</Text>
-            <Text>{props.singleMedia.description}</Text>
+            <Text>{singleMedia.title}</Text>
+            <Text>{singleMedia.description}</Text>
         </TouchableOpacity>
     );
 };
