@@ -1,5 +1,5 @@
-import { FlatList, Image, Text, TouchableOpacity } from "react-native";
-
+import { FlatList,StyleSheet, Image, Text, TouchableOpacity } from "react-native";
+import ListItem from './ListItem';
 
 const mediaArray = [
     {
@@ -34,28 +34,27 @@ const mediaArray = [
     },
   ];
 
-const List = () =>{
-return (
-    <FlatList
-    data={mediaArray}
-    renderItem={({item}) => {
-      return (
-        <TouchableOpacity
-          onPress={() => {
-            console.log('touched!', item.title);
-          }}
-        >
-          <Image
-            style={{width: 100, height: 100}}
-            source={{uri: item.thumbnails.w160}}
-          />
-          <Text>{item.title}</Text>
-          <Text>{item.description}</Text>
-        </TouchableOpacity>
-      );
-    }}
-  />
-);
-};
-
-export default List;
+    
+  const List = () => {
+    const renderMediaItem = ({ item }) => {
+      return <ListItem singleMedia={item} />;
+    };
+  
+    return (
+      <FlatList
+        data={mediaArray}
+        renderItem={renderMediaItem}
+        keyExtractor={(item) => item.key}
+        style={styles.container}
+      />
+    );
+  };
+  
+  const styles = StyleSheet.create({
+    container: {
+      padding: 16,
+    },
+  });
+  
+  export default List;
+  
