@@ -8,9 +8,13 @@ import {
 import PropTypes from 'prop-types';
 import { MainContext } from '../contexts/MainContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuthentication } from '../hooks/ApiHooks';
+
 
 const Login = ({ navigation }) => { // props is needed for navigation
+
   const { setIsLoggedIn } = useContext(MainContext);
+  const { postLogin } = useAuthentication();
 
   const checkToken = async () => {
     try {
@@ -34,10 +38,15 @@ const Login = ({ navigation }) => { // props is needed for navigation
   const logIn = async () => {
     console.log('Button pressed');
     try {
+      const loginResponse = await postLogin({ username: 'Kimrauti', password: '12345' });
+      console.log('login response: ', loginResponse);
+      // TODO fix doFetch() to display errors from API (e.g. when bad user /)
+      // use loginResponse.user for storing token and userdata
       await AsyncStorage.setItem('userToken', 'abcde');
       setIsLoggedIn(true);
     } catch (e) {
-      console.error(error);
+      console.error(e);
+      // TODO: notify user about failed login?
     }
   };
   return (
