@@ -49,7 +49,22 @@ const useAuthentication = () => {
     }
 
   };
-  return {postLogin};
+  return { postLogin };
 };
 
-export { useMedia, useAuthentication };
+const useUser = () => {
+
+  const getUserByToken = async (token) => {
+
+      const options = {
+        method: 'GET',
+        headers: { 'x-access-token': token },
+      };
+
+      return await doFetch(apiUrl + 'users/user', options);
+  };
+
+  return { getUserByToken };
+};
+
+export { useMedia, useAuthentication, useUser };

@@ -10,6 +10,7 @@ const ListItem = ({singleMedia, navigation}) => {
         navigation.navigate('Single', singleMedia);
       }}
     >
+      
       <Image
         style={{width: 100, height: 100}}
         source={{uri: mediaUrl + singleMedia.thumbnails.w160}}

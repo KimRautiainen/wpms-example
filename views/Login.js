@@ -8,19 +8,23 @@ import {
 import PropTypes from 'prop-types';
 import { MainContext } from '../contexts/MainContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuthentication } from '../hooks/ApiHooks';
+import { useAuthentication, useUser } from '../hooks/ApiHooks';
 
 
 const Login = ({ navigation }) => { // props is needed for navigation
 
   const { setIsLoggedIn } = useContext(MainContext);
   const { postLogin } = useAuthentication();
+  const { getUserByToken } = useUser();
 
   const checkToken = async () => {
     try {
       await AsyncStorage.getItem('userToken');
       // harcoded token validation
-      if (token === 'abcde'); {
+      const userData = await getUserByToken(token);
+      console.log('userdate:' , userData);
+
+      if (userData); {
         setIsLoggedIn(true);
       }
 
@@ -42,7 +46,7 @@ const Login = ({ navigation }) => { // props is needed for navigation
       console.log('login response: ', loginResponse);
       // TODO fix doFetch() to display errors from API (e.g. when bad user /)
       // use loginResponse.user for storing token and userdata
-      await AsyncStorage.setItem('userToken', 'abcde');
+      await AsyncStorage.setItem('userToken', loginResponse.token);
       setIsLoggedIn(true);
     } catch (e) {
       console.error(e);
