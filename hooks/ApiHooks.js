@@ -64,7 +64,8 @@ const useUser = () => {
       return await doFetch(apiUrl + 'users/user', options);
   };
 
-  const postUser = async () => {
+  const postUser = async (userData) => {
+    console.log("userData: ", userData);
     const options = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json',
