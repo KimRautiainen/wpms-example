@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Platform, SafeAreaView, StyleSheet, Text, Button, Image } from 'react-native';
 import { MainContext } from '../contexts/MainContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTag } from '../hooks/ApiHooks';
 import { mediaUrl } from '../utils/app-config';
+import { Card, Icon, ListItem, Button } from '@rneui/themed';
 
 const Profile = (props) => {
   const [avatar, setAvatar] = useState('http://placekitten.com/640');
@@ -34,31 +34,21 @@ const Profile = (props) => {
     loadAvatar();
   }, []);
   return (
-    <SafeAreaView style={styles.container}>
-      <Text>Profile view</Text>
-      <Text>{user.username}</Text>
-      <Image source={{ uri: avatar }} style={styles.Image}></Image>
-      <Text>{user.email}</Text>
-      <Text>{user.user_id}</Text>
+    <Card>
+
+      <Card.Title>{user.username}</Card.Title>
+      <Card.Image source={{ uri: avatar }}></Card.Image>
+
+      <ListItem><Icon name='email'/><ListItem.Title>{user.email}</ListItem.Title></ListItem>
+
+
+      <ListItem><Icon name='person'/><ListItem.Title>{user.user_id}</ListItem.Title></ListItem>
+      <Card.Divider></Card.Divider>
       <Button title='LogOut' onPress={logOut} />
-    </SafeAreaView>
+    </Card>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: Platform.OS === 'android' ? 30 : 0,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  Image: {
-    flex: 1,
-    width: 390,
-    height: 500,
-    resizeMode: 'contain',
-  },
-});
+
 
 export default Profile;

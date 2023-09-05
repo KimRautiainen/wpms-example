@@ -1,8 +1,8 @@
-import {Image, Text, TouchableOpacity} from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import PropTypes from 'prop-types';
-import {mediaUrl} from '../utils/app-config';
-
-const ListItem = ({singleMedia, navigation}) => {
+import { mediaUrl } from '../utils/app-config';
+import { Avatar, Button, ButtonGroup, ListItem as RNEListItem } from '@rneui/themed';
+const ListItem = ({ singleMedia, navigation }) => {
   return (
     <TouchableOpacity
       onPress={() => {
@@ -10,13 +10,29 @@ const ListItem = ({singleMedia, navigation}) => {
         navigation.navigate('Single', singleMedia);
       }}
     >
-      
-      <Image
-        style={{width: 100, height: 100}}
-        source={{uri: mediaUrl + singleMedia.thumbnails.w160}}
-      />
-      <Text>{singleMedia.title}</Text>
-      <Text>{singleMedia.description}</Text>
+      <RNEListItem bottomDivider>
+        <Avatar
+          rounded
+          size="large"
+          source={{ uri: mediaUrl + singleMedia.thumbnails.w160 }}
+        />
+
+
+        <RNEListItem.Title>{singleMedia.title}</RNEListItem.Title>
+        <RNEListItem.Subtitle>{singleMedia.description}</RNEListItem.Subtitle>
+
+
+
+        <RNEListItem.ButtonGroup>
+          <Button size='sm'>View</Button>
+        </RNEListItem.ButtonGroup>
+
+      </RNEListItem>
+
+
+
+
+
     </TouchableOpacity>
   );
 };
