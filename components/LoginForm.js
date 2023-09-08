@@ -42,7 +42,7 @@ const LoginForm = () => {
       <Controller
         control={control}
         rules={{
-          required: true,
+          required: {value: true, message: 'is required'}
         }}
         render={({field: {onChange, onBlur, value}}) => (
           <Input
@@ -51,16 +51,18 @@ const LoginForm = () => {
             onChangeText={onChange}
             value={value}
             autoCapitalize="none"
+            errorMessage={errors.username?.message}
           />
         )}
         name="username"
       />
-      {errors.username && <Text>This is required.</Text>}
+
 
       <Controller
         control={control}
         rules={{
           maxLength: 100,
+          required: {value: true, message: 'is required'}
         }}
         render={({field: {onChange, onBlur, value}}) => (
           <Input
@@ -69,6 +71,7 @@ const LoginForm = () => {
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
+            errorMessage={errors.password?.message}
           />
         )}
         name="password"

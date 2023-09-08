@@ -12,6 +12,7 @@ const RegisterForm = () => {
   const {
     control,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -45,14 +46,14 @@ const RegisterForm = () => {
       <Controller
         control={control}
         rules={{
-          required: true,
-          minLength: 3,
+          required: { value: true, message: 'is required' },
+          minLength: { value: 3, message: 'min length is 3 characters' },
           validate: async (value) => {
             try {
-            const isAvailable = await checkUserName(value);
-            console.log('username available?', value);
-            return isAvailable ? isAvailable : 'Username taken';
-            } catch(error){
+              const isAvailable = await checkUserName(value);
+              console.log('username available?', value);
+              return isAvailable ? isAvailable : 'Username taken';
+            } catch (error) {
               console.error(error);
             }
           }
@@ -69,15 +70,14 @@ const RegisterForm = () => {
         )}
         name="username"
       />
-      {errors.username && <Text>This is required.</Text>}
 
-          <Text>{errors.username?.message}</Text>
+
+
       <Controller
         control={control}
         rules={{
-          maxLength: 100,
-          required: true,
-          minLength: 5
+          required: { value: true, message: "is required" },
+          minLength: { value: 5, message: "min lenght is 5 characters" }
         }}
         render={({ field: { onChange, onBlur, value } }) => (
           <Input
@@ -86,34 +86,62 @@ const RegisterForm = () => {
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
-            autoCapitalize="none"
+            errorMessage={errors.password?.message}
           />
         )}
         name="password"
       />
 
-      <Controller
+<Controller
         control={control}
         rules={{
-          maxLength: 100,
+          required: { value: true, message: "is required" },
+          validate: (value) => {
+            const {password} = getValues();
+            return value === password ? true : 'Passwords dont match';
+
+          },
         }}
         render={({ field: { onChange, onBlur, value } }) => (
           <Input
-            placeholder="email"
-
+            placeholder="Confirm password"
+            secureTextEntry
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
-            autoCapitalize="none"
+            errorMessage={errors.confirm_password?.message}
           />
         )}
-        name="email"
+        name="confirm_password"
       />
 
       <Controller
         control={control}
         rules={{
-          maxLength: 100,
+          required: { value: true, message: 'is required' },
+          pattern: {
+            // TODO: add better regex for email
+            value: /@/,
+              message: 'must be valid email',
+          }
+        }}
+      render={({ field: { onChange, onBlur, value } }) => (
+        <Input
+          placeholder="email"
+
+          onBlur={onBlur}
+          onChangeText={onChange}
+          value={value}
+          errorMessage={errors.email?.message}
+        />
+      )}
+      name="email"
+      />
+
+      <Controller
+        control={control}
+        rules={{
+          minLength: { value: 3, message: 'min length is 3 characters' },
         }}
         render={({ field: { onChange, onBlur, value } }) => (
           <Input
@@ -122,7 +150,7 @@ const RegisterForm = () => {
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
-            autoCapitalize="none"
+            errorMessage={errors.full_name?.message}
           />
         )}
         name="full_name"
