@@ -10,22 +10,21 @@ const ListItem = ({ singleMedia, navigation }) => {
         navigation.navigate('Single', singleMedia);
       }}
     >
+
       <RNEListItem bottomDivider>
         <Avatar
           rounded
           size="large"
           source={{ uri: mediaUrl + singleMedia.thumbnails.w160 }}
         />
-
-
         <RNEListItem.Title>{singleMedia.title}</RNEListItem.Title>
         <RNEListItem.Subtitle>{singleMedia.description}</RNEListItem.Subtitle>
 
 
 
-        <RNEListItem.ButtonGroup>
+        {/* <RNEListItem.ButtonGroup>
           <Button size='sm'>View</Button>
-        </RNEListItem.ButtonGroup>
+        </RNEListItem.ButtonGroup> */}
 
       </RNEListItem>
 
