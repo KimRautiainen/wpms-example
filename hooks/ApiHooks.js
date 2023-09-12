@@ -3,7 +3,7 @@ import {apiUrl} from '../utils/app-config';
 import {doFetch} from '../utils/functions';
 import {error} from '@babel/eslint-parser/lib/convert/index.cjs';
 
-const useMedia = () => {
+const useMedia = (update) => {
   const [mediaArray, setMediaArray] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +27,7 @@ const useMedia = () => {
 
   useEffect(() => {
     loadMedia();
-  }, []);
+  }, [update]);
 
   const postMedia = async (mediaData, token) => {
     setLoading(true);

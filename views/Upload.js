@@ -1,22 +1,25 @@
-import {Card, Input} from '@rneui/themed';
-import {Controller, useForm} from 'react-hook-form';
-import {Button} from '@rneui/base';
-import {StyleSheet} from 'react-native';
+import { Card, Input } from '@rneui/themed';
+import { Controller, useForm } from 'react-hook-form';
+import { Button } from '@rneui/base';
+import { Alert, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import {useState} from 'react';
-import {placeholderImage} from '../utils/app-config';
-import {Video} from 'expo-av';
+import { useContext, useState } from 'react';
+import { placeholderImage } from '../utils/app-config';
+import { Video } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useMedia} from '../hooks/ApiHooks';
+import { useMedia } from '../hooks/ApiHooks';
+import PropTypes from 'prop-types';
+import { MainContext } from '../contexts/MainContext';
 
-const Upload = () => {
+const Upload = ({navigation}) => {
+  const {update, setUpdate} = useContext(MainContext);
   const [image, setImage] = useState(placeholderImage);
   const [type, setType] = useState('image');
-  const {postMedia, loading} = useMedia();
+  const { postMedia, loading } = useMedia();
   const {
     control,
     handleSubmit,
-    formState: {errors},
+    formState: { errors },
   } = useForm({
     defaultValues: {
       title: '',
@@ -44,6 +47,14 @@ const Upload = () => {
       const token = await AsyncStorage.getItem('userToken');
       const response = await postMedia(formData, token);
       console.log('lataus', response);
+      setUpdate(!update);
+      Alert.alert('Upload', response.message + 'Id: ' + response.file_id, [{
+        text: 'Ok', onPress: () => {
+          navigation.navigate('Home');
+        },
+
+
+      }]);
     } catch (error) {
       console.log(error.message);
     }
@@ -56,7 +67,9 @@ const Upload = () => {
       aspect: [4, 3],
     });
 
-    console.log(result);
+    // purkka key cancelled in the image picker result is deprecated - warning
+    //delete result.cancelled;
+    //console.log(result);
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
@@ -68,13 +81,13 @@ const Upload = () => {
     <Card>
       {type === 'image' ? (
         <Card.Image
-          source={{uri: image}}
+          source={{ uri: image }}
           style={styles.image}
           onPress={pickImage}
         />
       ) : (
         <Video
-          source={{uri: image}}
+          source={{ uri: image }}
           style={styles.image}
           useNativeControls={true}
           resizeMode="cover"
@@ -83,9 +96,9 @@ const Upload = () => {
       <Controller
         control={control}
         rules={{
-          required: {value: true, message: 'is required'},
+          required: { value: true, message: 'is required' },
         }}
-        render={({field: {onChange, onBlur, value}}) => (
+        render={({ field: { onChange, onBlur, value } }) => (
           <Input
             placeholder="Title"
             onBlur={onBlur}
@@ -100,9 +113,9 @@ const Upload = () => {
       <Controller
         control={control}
         rules={{
-          minLength: {value: 10, message: 'min 10 characters'},
+          minLength: { value: 10, message: 'min 10 characters' },
         }}
-        render={({field: {onChange, onBlur, value}}) => (
+        render={({ field: { onChange, onBlur, value } }) => (
           <Input
             placeholder="Description (optional)"
             onBlur={onBlur}
@@ -129,4 +142,7 @@ const styles = StyleSheet.create({
   },
 });
 
+Upload.protoTypes = {
+  navigation: PropTypes.object,
+};
 export default Upload;
