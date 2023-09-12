@@ -6,9 +6,10 @@ import { MainContext } from '../contexts/MainContext';
 import { Card, Input, Button, Text } from '@rneui/themed';
 import { Alert } from 'react-native';
 import { PropTypes } from 'prop-types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const RegisterForm = ({ setToggleRegister }) => {
-  const { postUser, checkUserName } = useUser();
+const ProfileForm = ({ user }) => {
+  const { putUser, checkUserName} = useUser();
   const { setIsLoggedIn, setUser } = useContext(MainContext);
 
   const {
@@ -17,23 +18,27 @@ const RegisterForm = ({ setToggleRegister }) => {
     getValues,
     formState: { errors },
   } = useForm({
-    defaultValues: {
-      username: '',
-      password: '',
-      email: '',
-      full_name: '',
-    },
+    defaultValues: {...user, password: '', confirm_password: ''},
     mode: 'onBlur',
   });
 
-  const register = async (userData) => {
+  const update = async (updateData) => {
 
     try {
-      delete userData.confirm_password
-      const registerResponse = await postUser(userData);
-      console.log('postUser response', registerResponse);
-      Alert.alert("Success", registerResponse.message);
-      setToggleRegister(false);
+      delete updateData.confirm_password
+      // Poistetaan tyhjät arvot
+      for (const [i,value] of Object.entries(updateData)){
+        console.log(i,value);
+        if(value === ''){
+          delete updateData[i]
+        }
+      }
+      console.log('Toimiiko?', updateData)
+      const token = await AsyncStorage.getItem('userToken')
+      const updateResult = await putUser(updateData, token);
+      console.log('putUser response', updateResult);
+      Alert.alert("Success", updateResult.message);
+     // setToggleRegister(false);
     } catch (error) {
       Alert.alert('Error', error.message);
     }
@@ -41,14 +46,16 @@ const RegisterForm = ({ setToggleRegister }) => {
 
   return (
     <Card>
-      <Card.Title>Register</Card.Title>
+      <Card.Title>Update profile</Card.Title>
       <Controller
         control={control}
         rules={{
-          required: { value: true, message: 'is required' },
           minLength: { value: 3, message: 'min length is 3 characters' },
           validate: async (value) => {
             try {
+              if(value.length < 3 ){
+                return;
+              }
               const isAvailable = await checkUserName(value);
               console.log('username available?', value);
               return isAvailable ? isAvailable : 'Username taken';
@@ -75,7 +82,6 @@ const RegisterForm = ({ setToggleRegister }) => {
       <Controller
         control={control}
         rules={{
-          required: { value: true, message: "is required" },
           minLength: { value: 5, message: "min lenght is 5 characters" }
         }}
         render={({ field: { onChange, onBlur, value } }) => (
@@ -94,9 +100,11 @@ const RegisterForm = ({ setToggleRegister }) => {
       <Controller
         control={control}
         rules={{
-          required: { value: true, message: "is required" },
           validate: (value) => {
             const { password } = getValues();
+            if(password.length < 5 ){
+              return;
+            }
             return value === password ? true : 'Passwords dont match';
 
           },
@@ -117,7 +125,6 @@ const RegisterForm = ({ setToggleRegister }) => {
       <Controller
         control={control}
         rules={{
-          required: { value: true, message: 'is required' },
           pattern: {
             // TODO: add better regex for email
             value: /\S+@\S+\.\S+$/,
@@ -155,13 +162,13 @@ const RegisterForm = ({ setToggleRegister }) => {
         name="full_name"
       />
 
-      <Button title="Submit" onPress={handleSubmit(register)} />
+      <Button title="Update" onPress={handleSubmit(update)} />
     </Card>
   );
 };
 
-RegisterForm.propTypes = {
-  setToggleRegister: PropTypes.func,
+ProfileForm.propTypes = {
+  user: PropTypes.object,
 }
 
-export default RegisterForm;
+export default ProfileForm;

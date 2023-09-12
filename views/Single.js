@@ -1,59 +1,46 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Platform, SafeAreaView, StyleSheet, Text, Image } from 'react-native';
-import { mediaUrl } from '../utils/app-config';
+import {mediaUrl} from '../utils/app-config';
+import {formatDate} from '../utils/functions';
+import {Card, Icon, Text, ListItem} from '@rneui/themed';
 
-const Single = ({ route, navigation }) => {
-  //console.log('route params', route.params);
-  const singleMedia = route.params;
-  console.log(mediaUrl + singleMedia.id);
-  // TODO: Show image and all metadata, fix styling
+const Single = ({route, navigation}) => {
+  // console.log('route params', route.params);
+  const {
+    title,
+    description,
+    filename,
+    time_added: timeAdded,
+    user_id: userId,
+    filesize,
+  } = route.params;
+  // Show full image and metadata
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>
-
-        {singleMedia.title}
-      </Text>
-      <Image
-
-        style={styles.Image}
-        source={{ uri: mediaUrl + singleMedia.filename }}
+    <Card>
+      <Card.Title>{title}</Card.Title>
+      <Card.Image
+        source={{uri: mediaUrl + filename}}
+        resizeMode="center"
+        style={{height: 300}}
       />
-      <Text style={styles.description}>{singleMedia.description}</Text>
-      <Text style={styles.fileText}>{singleMedia.filename}</Text>
-    </SafeAreaView>
+      <ListItem>
+        <Text>{description}</Text>
+      </ListItem>
+      <ListItem>
+        <Icon name="save" />
+        <Text>{Math.round(filesize / 1024)} kB</Text>
+      </ListItem>
+      <ListItem>
+        <Icon name="today" />
+        <Text>{formatDate(timeAdded)}</Text>
+      </ListItem>
+      <ListItem>
+        <Icon name="person" />
+        <Text>id: {userId}</Text>
+      </ListItem>
+    </Card>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: Platform.OS === 'android' ? 30 : 0,
-    backgroundColor: '#F5FFFE',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  Image: {
-    flex: 1,
-    width: 390,
-    height: 500,
-    resizeMode: 'contain',
-  },
-  title: {
-    marginTop: 10,
-    color: 'black',
-    fontSize: 30,
-    fontWeight: 'bold'
-  },
-  description: {
-    marginBottom: 25,
-    fontFamily: 'Arial',
-    fontSize: 18,
-  },
-  fileText: {
-    marginBottom: 25,
-  }
-});
 
 Single.propTypes = {
   navigation: PropTypes.object,

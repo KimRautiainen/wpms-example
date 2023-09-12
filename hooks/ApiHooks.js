@@ -1,21 +1,24 @@
-import { useState, useEffect } from "react";
-import { apiUrl } from "../utils/app-config";
-import { doFetch } from "../utils/functions";
+import {useEffect, useState} from 'react';
+import {apiUrl} from '../utils/app-config';
+import {doFetch} from '../utils/functions';
+import {error} from '@babel/eslint-parser/lib/convert/index.cjs';
 
 const useMedia = () => {
   const [mediaArray, setMediaArray] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const loadMedia = async () => {
     try {
       const json = await doFetch(apiUrl + 'media');
-      //console.log(json)
+      // console.log(json);
       const mediaFiles = await Promise.all(
         json.map(async (item) => {
           const fileData = await doFetch(apiUrl + 'media/' + item.file_id);
-          //console.log('filedata', fileData);
+          // console.log('fileData', fileData);
           return fileData;
         }),
       );
+      // console.log(data);
       setMediaArray(mediaFiles);
     } catch (error) {
       console.error('loadMedia failed', error);
@@ -25,47 +28,48 @@ const useMedia = () => {
   useEffect(() => {
     loadMedia();
   }, []);
-  return { mediaArray };
+
+  const postMedia = async (mediaData, token) => {
+    setLoading(true);
+    const options = {
+      method: 'POST',
+      headers: {
+        'x-access-token': token,
+      },
+      body: mediaData,
+    };
+    const uploadResult = await doFetch(apiUrl + 'media', options);
+    setLoading(false);
+    return uploadResult;
+  };
+
+  return {mediaArray, postMedia, loading};
 };
 
 const useAuthentication = () => {
-
   const postLogin = async (user) => {
-    try {
-      console.log('uuseri', user, apiUrl + "login");
-      return await doFetch(apiUrl + "login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify(user)
-
-
-      });
-    } catch (e) {
-      console.error('postLogin error: ', e);
-
-    }
-
+    return await doFetch(apiUrl + 'login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user),
+    });
   };
-  return { postLogin };
+
+  return {postLogin};
 };
 
 const useUser = () => {
-
   const getUserByToken = async (token) => {
-
     const options = {
       method: 'GET',
-      headers: { 'x-access-token': token },
+      headers: {'x-access-token': token},
     };
-
     return await doFetch(apiUrl + 'users/user', options);
   };
 
   const postUser = async (userData) => {
-    console.log("userData: ", userData);
     const options = {
       method: 'POST',
       headers: {
@@ -73,20 +77,31 @@ const useUser = () => {
       },
       body: JSON.stringify(userData),
     };
-
     return await doFetch(apiUrl + 'users', options);
   };
 
-  const checkUserName = async (username) => {
-    try{
-      const response = await doFetch(apiUrl + 'users/username/' + username);
+  const putUser = async (userData, token) => {
+    const options = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': token,
+      },
+      body: JSON.stringify(userData),
+    };
+    return await doFetch(apiUrl + 'users', options);
+  };
+
+  const checkUsername = async (username) => {
+    try {
+      const response = await doFetch(`${apiUrl}users/username/${username}`);
       return response.available;
-    }catch{
-      throw new Error('checkUserName Error', error.message)
+    } catch {
+      throw new Error('checkusername Error', error.message);
     }
   };
 
-  return { getUserByToken, postUser, checkUserName };
+  return {getUserByToken, postUser, checkUsername, putUser};
 };
 
 const useTag = () => {
@@ -94,10 +109,10 @@ const useTag = () => {
     try {
       return await doFetch(apiUrl + 'tags/' + tag);
     } catch (error) {
-      throw new Error('getFilesByTag error: ', error.message);
+      throw new Error('getFilesByTag error', error.message);
     }
   };
   return {getFilesByTag};
 };
 
-export { useMedia, useAuthentication, useUser, useTag };
+export {useMedia, useAuthentication, useUser, useTag};
