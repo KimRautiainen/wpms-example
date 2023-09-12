@@ -1,7 +1,7 @@
 import { Card, Input } from '@rneui/themed';
 import { Controller, useForm } from 'react-hook-form';
 import { Button } from '@rneui/base';
-import { Alert, StyleSheet } from 'react-native';
+import { Alert, KeyboardAvoidingView, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useContext, useState } from 'react';
 import { placeholderImage } from '../utils/app-config';
@@ -11,13 +11,14 @@ import { useMedia } from '../hooks/ApiHooks';
 import PropTypes from 'prop-types';
 import { MainContext } from '../contexts/MainContext';
 
-const Upload = ({navigation}) => {
-  const {update, setUpdate} = useContext(MainContext);
+const Upload = ({ navigation }) => {
+  const { update, setUpdate } = useContext(MainContext);
   const [image, setImage] = useState(placeholderImage);
   const [type, setType] = useState('image');
   const { postMedia, loading } = useMedia();
   const {
     control,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -25,6 +26,7 @@ const Upload = ({navigation}) => {
       title: '',
       description: '',
     },
+    mode: 'onBlur',
   });
 
   const upload = async (uploadData) => {
@@ -50,6 +52,8 @@ const Upload = ({navigation}) => {
       setUpdate(!update);
       Alert.alert('Upload', response.message + 'Id: ' + response.file_id, [{
         text: 'Ok', onPress: () => {
+          resetForm();
+
           navigation.navigate('Home');
         },
 
@@ -58,6 +62,13 @@ const Upload = ({navigation}) => {
     } catch (error) {
       console.log(error.message);
     }
+  };
+
+  const resetForm = () => {
+    setImage(placeholderImage);
+    setType('image');
+    reset();
+
   };
 
   const pickImage = async () => {
@@ -78,57 +89,65 @@ const Upload = ({navigation}) => {
   };
 
   return (
-    <Card>
-      {type === 'image' ? (
-        <Card.Image
-          source={{ uri: image }}
-          style={styles.image}
-          onPress={pickImage}
-        />
-      ) : (
-        <Video
-          source={{ uri: image }}
-          style={styles.image}
-          useNativeControls={true}
-          resizeMode="cover"
-        />
-      )}
-      <Controller
-        control={control}
-        rules={{
-          required: { value: true, message: 'is required' },
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <Input
-            placeholder="Title"
-            onBlur={onBlur}
-            onChangeText={onChange}
-            value={value}
-            errorMessage={errors.title?.message}
+    <KeyboardAvoidingView>
+      <Card>
+        {type === 'image' ? (
+          <Card.Image
+            source={{ uri: image }}
+            style={styles.image}
+            onPress={pickImage}
+          />
+        ) : (
+          <Video
+            source={{ uri: image }}
+            style={styles.image}
+            useNativeControls={true}
+            resizeMode="cover"
           />
         )}
-        name="title"
-      />
+        <Controller
+          control={control}
+          rules={{
+            required: { value: true, message: 'is required' },
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              placeholder="Title"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              errorMessage={errors.title?.message}
+            />
+          )}
+          name="title"
+        />
 
-      <Controller
-        control={control}
-        rules={{
-          minLength: { value: 10, message: 'min 10 characters' },
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <Input
-            placeholder="Description (optional)"
-            onBlur={onBlur}
-            onChangeText={onChange}
-            value={value}
-            errorMessage={errors.description?.message}
-          />
-        )}
-        name="description"
-      />
-      <Button title="Choose Media" onPress={pickImage} />
-      <Button loading={loading} title="Upload" onPress={handleSubmit(upload)} />
-    </Card>
+        <Controller
+          control={control}
+          rules={{
+            minLength: { value: 10, message: 'min 10 characters' },
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              placeholder="Description (optional)"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              errorMessage={errors.description?.message}
+            />
+          )}
+          name="description"
+        />
+        <Button title="Choose Media" onPress={pickImage} />
+        <Button title="Reset" type='clear' color={'warning'} onPress={resetForm} />
+        <Button
+          loading={loading}
+          disabled={image == placeholderImage || errors.description || errors.title}
+          title="Upload"
+          onPress={handleSubmit(upload)}
+        />
+      </Card>
+    </KeyboardAvoidingView>
   );
 };
 
