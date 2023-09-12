@@ -4,10 +4,10 @@ import { Button } from '@rneui/base';
 import { Alert, KeyboardAvoidingView, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useContext, useState } from 'react';
-import { placeholderImage } from '../utils/app-config';
+import { appId, placeholderImage } from '../utils/app-config';
 import { Video } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useMedia } from '../hooks/ApiHooks';
+import { useMedia, useTag } from '../hooks/ApiHooks';
 import PropTypes from 'prop-types';
 import { MainContext } from '../contexts/MainContext';
 
@@ -16,6 +16,7 @@ const Upload = ({ navigation }) => {
   const [image, setImage] = useState(placeholderImage);
   const [type, setType] = useState('image');
   const { postMedia, loading } = useMedia();
+  const { postTag } = useTag();
   const {
     control,
     reset,
@@ -49,6 +50,12 @@ const Upload = ({ navigation }) => {
       const token = await AsyncStorage.getItem('userToken');
       const response = await postMedia(formData, token);
       console.log('lataus', response);
+      const tagResponse =  await postTag({
+        file_id: response.file_id,
+        tag: appId
+      }, token
+      );
+      console.log("Post tag: " ,tagResponse);
       setUpdate(!update);
       Alert.alert('Upload', response.message + 'Id: ' + response.file_id, [{
         text: 'Ok', onPress: () => {
@@ -61,6 +68,7 @@ const Upload = ({ navigation }) => {
       }]);
     } catch (error) {
       console.log(error.message);
+      // TODO notify user about failed
     }
   };
 
