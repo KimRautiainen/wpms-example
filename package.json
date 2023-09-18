@@ -25,7 +25,8 @@
     "react-native-safe-area-context": "4.6.3",
     "react-native-screens": "~3.22.0",
     "expo-image-picker": "~14.3.2",
-    "expo-av": "~13.4.1"
+    "expo-av": "~13.4.1",
+    "expo-screen-orientation": "~6.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.22.10",
