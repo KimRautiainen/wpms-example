@@ -100,6 +100,7 @@ const Modify = ({navigation, route}) => {
         disabled={errors.description || errors.title}
         title="Update"
         onPress={handleSubmit(updateMedia)}
+        
       />
     </Card>
   );

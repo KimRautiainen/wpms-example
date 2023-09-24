@@ -14,10 +14,13 @@ const useMedia = (update, myFilesOnly) => {
       if (userId) {
         json = await doFetch(apiUrl + 'media/user/' + userId);
       } else {
+
         // all mediafiles
         // const json = await doFetch(apiUrl + 'media');
+
         // files with specific appId
         json = await doFetch(apiUrl + 'tags/' + appId);
+        
         // list newest file first when using tags
         json.reverse();
       }
